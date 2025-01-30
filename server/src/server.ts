@@ -3,6 +3,7 @@ import express from 'express';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import path from 'path';
+// import { Context } from 'vm';
 
 // TODO: Uncomment the following code once you have built the queries and mutations in the client folder
 const PORT = process.env.PORT || 3001
@@ -32,10 +33,11 @@ const startApolloServer = async () => {
   // TODO: Uncomment the following code once you have built the queries and mutations in the client folder
   app.use('/graphql', expressMiddleware(server as any
     ,{
-      context: authenticateToken as any
-    }
+      context: authenticateToken
+    },
   ));
 
+  console.log(authenticateToken.name)
 
   // if we're in production, serve client/dist as static assets
   if (process.env.NODE_ENV === 'production') {

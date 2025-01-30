@@ -8,19 +8,17 @@ import { removeBookId } from '../utils/localStorage';
 import { REMOVE_BOOK } from '../utils/mutations';
 import { QUERY_ME} from '../utils/queries'
 import { useQuery } from '@apollo/client';
-import { useParams } from 'react-router-dom';
+// import { useParams } from 'react-router-dom';
 import { Book } from '../models/Book';
 import { useMutation } from '@apollo/client';
 
 const SavedBooks = () => {
 
-  const {id, username} = useParams()
-  const {loading, data} = useQuery(QUERY_ME, {
-    variables: { id, username}
-  })
+  // const {username} = useParams()
+  const {loading, data} = useQuery(QUERY_ME)
 
   // use this to determine if `useEffect()` hook needs to run again
-
+  console.log(data)
   
 
 
@@ -48,7 +46,7 @@ const SavedBooks = () => {
   };
 
   // if data isn't here yet, say so
-  if (loading) {
+  if (loading || !data) {
     return <h2>LOADING...</h2>;
   }
 

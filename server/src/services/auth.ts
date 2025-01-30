@@ -2,13 +2,14 @@
 import jwt from 'jsonwebtoken';
 
 import dotenv from 'dotenv';
+// import { Context } from 'vm';
 dotenv.config();
 
-// interface JwtPayload {
-//   _id: unknown;
-//   username: string;
-//   email: string,
-// }
+interface JwtPayload {
+  _id: unknown;
+  username: string;
+  email: string,
+}
 
 export const authenticateToken = ({ req }: any) => {
   console.log(req.headers)
@@ -20,9 +21,14 @@ export const authenticateToken = ({ req }: any) => {
 
     const secretKey = process.env.JWT_SECRET_KEY || '';
 
+
+    // I keep getting an error with the resolver not returning any data. 
     try {
-      const { data }: any = jwt.verify(token, secretKey, { maxAge: '2hr'});
-      req.user = data
+      const verifiedToken = jwt.verify(token, secretKey, { maxAge: '2hr'});
+      console.log(verifiedToken)
+      const data = jwt.decode(token)
+      console.log("auth.ts data", data)
+      return data as JwtPayload
     } catch (err) {
       console.log("Error decoding jwt: ", err);
     }

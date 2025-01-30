@@ -4,7 +4,6 @@ export const CREATE_USER = gql`
 mutation Mutation($username: String!, $email: String!, $password: String!) {
   createUser(username: $username, email: $email, password: $password) {
     user {
-      _id
       username
       email
       password
@@ -13,12 +12,12 @@ mutation Mutation($username: String!, $email: String!, $password: String!) {
 }
 `;
 
+// Change: Removed username field and _id query on mutation
 export const LOGIN_USER = gql`
-  mutation login($username: String!, $password: String!, $email: String) {
-    login(username: $username, password: $password, email: $email) {
+  mutation Mutation($password: String!, $email: String!) {
+    login(password: $password, email: $email) {
       token 
       user {
-        _id
         username
       }
     }
