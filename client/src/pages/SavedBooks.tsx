@@ -18,7 +18,7 @@ const SavedBooks = () => {
   const {loading, data} = useQuery(QUERY_ME)
 
   // use this to determine if `useEffect()` hook needs to run again
-  console.log(data)
+  console.log("SavedBooks data", data)
   
 
 

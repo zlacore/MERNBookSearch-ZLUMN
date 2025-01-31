@@ -1,15 +1,22 @@
 // import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { GraphQLError } from 'graphql';
+
+
+
+
+
 
 import dotenv from 'dotenv';
 // import { Context } from 'vm';
+// import { Context } from 'vm';
 dotenv.config();
 
-interface JwtPayload {
-  _id: unknown;
-  username: string;
-  email: string,
-}
+// interface JwtPayload {
+//   _id: unknown;
+//   username: string;
+//   email: string,
+// }
 
 export const authenticateToken = ({ req }: any) => {
   console.log(req.headers)
@@ -26,9 +33,8 @@ export const authenticateToken = ({ req }: any) => {
     try {
       const verifiedToken = jwt.verify(token, secretKey, { maxAge: '2hr'});
       console.log(verifiedToken)
-      const data = jwt.decode(token)
-      console.log("auth.ts data", data)
-      return data as JwtPayload
+      req.user = verifiedToken
+      console.log("auth.ts data", req.user)
     } catch (err) {
       console.log("Error decoding jwt: ", err);
     }
@@ -42,4 +48,14 @@ export const signToken = (username: string, email: string, _id: unknown) => {
   const secretKey: any = process.env.JWT_SECRET_KEY || '';
 
   return jwt.sign({data: payload}, secretKey, {expiresIn: '2h'});
+};
+
+
+export class AuthenticationError extends GraphQLError {
+  constructor(message: string) {
+    super(message, {
+      extensions: { code: 'UNAUTHENTICATED' }
+    });
+    Object.defineProperty(this, 'name', { value: 'AuthenticationError' });
+  }
 };

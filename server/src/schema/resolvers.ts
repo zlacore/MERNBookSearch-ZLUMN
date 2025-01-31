@@ -43,9 +43,11 @@ const resolvers = {
     helloWorld: (_a: any, _b: any, context: any) => {
       return "Hello World! also, this: " + context.user;
     },
-    me: async (_parents: any, user : Context) => {
-      const me = await User.findOne({ username: user.username});
-      console.log("user", user)
+    me: async (_parents: any, _: any, ctx: Context) => {
+      console.log("YO", ctx);
+      const user = ctx.user.data.username
+      const me = await User.findOne({ username: user});
+      console.log("my info:", me)
       return me
     }
   },
@@ -78,7 +80,7 @@ const resolvers = {
       }
       const updatedBookList = await User.findOneAndUpdate(
         { _id: context.userId },
-        { $addToSet: { savedBooks: book } },
+        { $push: { savedBooks: book } },
         { new: true, runValidators: true }
       );
 
