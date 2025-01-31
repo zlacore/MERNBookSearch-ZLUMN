@@ -2,18 +2,24 @@ import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 
-import { createUser } from '../utils/API';
+// import { createUser } from '../utils/API';
+
+import { CREATE_USER } from '../utils/mutations';
+import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
-import type { User } from '../models/User';
+// import type { User } from '../models/User';
 
 // biome-ignore lint/correctness/noEmptyPattern: <explanation>
 const SignupForm = ({}: { handleModalClose: () => void }) => {
+
+ 
   // set initial form state
-  const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
+  const [userFormData, setUserFormData] = useState({ username: '', email: '', password: ''});
   // set state for form validation
   const [validated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
+  const [newUser] = useMutation(CREATE_USER);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -22,7 +28,7 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+  
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
@@ -31,13 +37,15 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
     }
 
     try {
-      const response = await createUser(userFormData);
 
-      if (!response.ok) {
+      const { data } = await newUser({
+        variables: { ...userFormData }
+      })
+      if (!data) {
         throw new Error('something went wrong!');
       }
 
-      const { token } = await response.json();
+      const { token } = data;
       Auth.login(token);
     } catch (err) {
       console.error(err);
@@ -47,8 +55,7 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
     setUserFormData({
       username: '',
       email: '',
-      password: '',
-      savedBooks: [],
+      password: ''
     });
   };
 

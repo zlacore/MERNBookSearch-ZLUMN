@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-import { loginUser } from '../utils/API';
+import { useMutation } from '@apollo/client';
+// import { loginUser } from '../utils/API';
+import { LOGIN_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
 import type { User } from '../models/User';
 
@@ -12,36 +13,41 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
   const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-
+  
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
+  
+  const [login] = useMutation(LOGIN_USER);
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+    
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
     }
-
+    
     try {
-      const response = await loginUser(userFormData);
 
-      if (!response.ok) {
+      // Code assisted by github copilot
+      const { data } = await login({
+        variables: { email: userFormData.email, password: userFormData.password },
+      });
+      
+      if (!data) {
         throw new Error('something went wrong!');
       }
-
-      const { token } = await response.json();
-      Auth.login(token);
+      
+      Auth.login(data.login.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
-
+    
     setUserFormData({
       username: '',
       email: '',
@@ -49,7 +55,7 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
       savedBooks: [],
     });
   };
-
+  
   return (
     <>
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
