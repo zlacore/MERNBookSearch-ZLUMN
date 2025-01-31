@@ -1,7 +1,9 @@
 
 import { Context } from "vm";
-import { User } from "../models/index.js";
+import { User, Book } from "../models/index.js";
+// import Book from "../models/index.js";
 import { signToken } from "../services/auth.js";
+
 // import { authenticateToken } from "../services/auth.js";
 // interface UserI {
 //   // _id: string;
@@ -27,7 +29,15 @@ interface LoginArgs {
 }
 
 interface SaveBookArgs {
-  book: string
+  input: {
+  bookId: String
+  authors: [String]
+  description: String
+  title: String
+  image: String
+  link: String
+}
+  
 }
 
 interface DeleteBookArgs {
@@ -46,14 +56,14 @@ const resolvers = {
     me: async (_parents: any, _: any, ctx: Context) => {
       console.log("YO", ctx);
       const user = ctx.user.data.username
-      const me = await User.findOne({ username: user});
+      const me = await User.findOne({ username: user });
       console.log("my info:", me)
       return me
     }
   },
   Mutation: {
     createUser: async (_parents: any, { username, email, password }: CreateUserArgs): Promise<{ user: any, token: string }> => {
-      const user = await User.create({ username: username, password: password, email: email});
+      const user = await User.create({ username: username, password: password, email: email });
       const token = signToken(user.username, user.email, user._id)
       console.log("TEST: createUser Token: ", token)
       return { token, user }
@@ -74,15 +84,21 @@ const resolvers = {
       console.log("TEST: login Token", token)
       return { token, user };
     },
-    saveBook: async (_parent: any, { book }: SaveBookArgs, context: Context) => {
+    saveBook: async (_parent: any, {input}: SaveBookArgs, context: Context) => {
       if (!context.user) {
         throw new Error("No user found!")
       }
+
+      // create the book 
+      const book = Book.create({...input})
+
       const updatedBookList = await User.findOneAndUpdate(
-        { _id: context.userId },
-        { $push: { savedBooks: book } },
+        { _id: context.user._id },
+        { $addToSet: {savedBooks: book}},
         { new: true, runValidators: true }
       );
+
+      console.log("Updated Book List", updatedBookList)
 
       return updatedBookList
     },
@@ -91,7 +107,7 @@ const resolvers = {
         throw new Error("User not found")
       }
       const updatedBookList = await User.findOneAndUpdate(
-        { _id: context.userId },
+        { _id: context.user.data._id },
         { $pull: { savedBooks: { bookId: book } } },
         { new: true, runValidators: true }
       );

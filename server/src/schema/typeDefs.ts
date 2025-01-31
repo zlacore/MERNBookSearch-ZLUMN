@@ -1,8 +1,7 @@
 
 const typeDefs = `
   type Book {
-    BookId: Int!
-    authors: [String]
+    authors: [String!]
     description: String!
     bookId: String!
     image: String
@@ -26,6 +25,7 @@ const typeDefs = `
     image: String
     link: String
   }
+  
   type Auth {
     token: String
     user: User
