@@ -1,6 +1,6 @@
 // import { useState} from 'react';
 import { Container, Card, Button, Row, Col } from 'react-bootstrap';
-
+import { useEffect } from 'react';
 // import { deleteBook } from '../utils/API';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
@@ -13,12 +13,14 @@ import { Book } from '../models/Book';
 import { useMutation } from '@apollo/client';
 
 const SavedBooks = () => {
-
   // const {username} = useParams()
-  const {loading, data} = useQuery(QUERY_ME)
+  const {loading, data, refetch} = useQuery(QUERY_ME)
+  useEffect(() => {
+    refetch()
+  }, [data.me] )
 
   // use this to determine if `useEffect()` hook needs to run again
-  console.log("SavedBooks data", data)
+  // console.log("SavedBooks data", data)
   
 
 
@@ -37,7 +39,7 @@ const SavedBooks = () => {
       await deleteBook({
         variables: { bookId }
       });
-
+      refetch();
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
@@ -54,8 +56,8 @@ const SavedBooks = () => {
     <>
       <div className='text-light bg-dark p-5'>
         <Container>
-          {data.username ? (
-            <h1>Viewing {data.username}'s saved books!</h1>
+          {data.me.username ? (
+            <h1>Viewing {data.me.username}'s saved books!</h1>
           ) : (
             <h1>Viewing saved books!</h1>
           )}
@@ -63,14 +65,15 @@ const SavedBooks = () => {
       </div>
       <Container>
         <h2 className='pt-5'>
-          {data.savedBooks.length
-            ? `Viewing ${data.savedBooks.length} saved ${
-                data.savedBooks.length === 1 ? 'book' : 'books'
-              }:`
+          {data.me.savedBooks.length
+            ? `Viewing ${data.me.savedBooks.length} saved ${
+              data.me.savedBooks.length === 1 ? 'book' : 'books'
+            }:`
             : 'You have no saved books!'}
         </h2>
         <Row>
-            {data.savedBooks.map((book: Book) => {
+            {data.me.savedBooks.map((book: Book) => {
+            {console.log(book.bookId)}
             return (
               <Col md='4' key={book.bookId}>
               <Card border='dark'>
@@ -88,14 +91,14 @@ const SavedBooks = () => {
                 <Button
                   className='btn-block btn-danger'
                   onClick={() => handleDeleteBook(book.bookId)}
-                >
+                  >
                   Delete this Book!
                 </Button>
                 </Card.Body>
               </Card>
               </Col>
             );
-            })}
+          })}
         </Row>
       </Container>
     </>

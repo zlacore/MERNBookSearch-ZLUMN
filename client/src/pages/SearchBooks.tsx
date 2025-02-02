@@ -85,9 +85,7 @@ const SearchBooks = () => {
 
       // Code assisted by github copilot
       await saveBook({
-        variables: { input: {
-          ...bookToSave
-      } }
+        variables: { input: bookToSave}
       });
       
       if (error) {
