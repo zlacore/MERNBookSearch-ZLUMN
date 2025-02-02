@@ -12,7 +12,9 @@ import { typeDefs, resolvers } from './schema/index.js';
 import db from './config/connection.js';
 import { authenticateToken } from './services/auth.js';
 
-
+import { fileURLToPath } from 'node:url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // TODO: Uncomment the following code once you have built the queries and mutations in the client folder
 
@@ -40,15 +42,23 @@ const startApolloServer = async () => {
   // console.log(authenticateToken.name)
 
   // if we're in production, serve client/dist as static assets
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
+  // if (process.env.NODE_ENV === 'production') {
+  //   app.use(express.static(path.join(__dirname, '../client/dist')));
 
-    // TODO: Uncomment this code once you have built out queries and mutations in the client folder
+  //   // TODO: Uncomment this code once you have built out queries and mutations in the client folder
+  //   app.get('*', (_req, res) => {
+  //     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  //   });
+  // }
+
+  const address = path.join(__dirname, '../../client/dist');
+    console.log("address!", address);
+    app.use(express.static(address));
+
+
     app.get('*', (_req, res) => {
-      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+      res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
     });
-  }
-
   // TODO: Uncomment this code once you have built out queries and mutations in the client folder
   // db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
