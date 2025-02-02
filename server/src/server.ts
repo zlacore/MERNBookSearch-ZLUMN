@@ -37,7 +37,7 @@ const startApolloServer = async () => {
     },
   ));
 
-  console.log(authenticateToken.name)
+  // console.log(authenticateToken.name)
 
   // if we're in production, serve client/dist as static assets
   if (process.env.NODE_ENV === 'production') {

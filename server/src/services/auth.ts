@@ -32,9 +32,9 @@ export const authenticateToken = ({ req }: any) => {
     // I keep getting an error with the resolver not returning any data. 
     try {
       const verifiedToken = jwt.verify(token, secretKey, { maxAge: '2hr'});
-      console.log(verifiedToken)
+      // console.log(verifiedToken)
       req.user = verifiedToken
-      console.log("auth.ts data", req.user)
+      // console.log("auth.ts data", req.user)
     } catch (err) {
       console.log("Error decoding jwt: ", err);
     }
