@@ -17,7 +17,7 @@ const SavedBooks = () => {
   const {loading, data, refetch} = useQuery(QUERY_ME)
   useEffect(() => {
     refetch()
-  }, [data.me] )
+  }, [data] )
 
   // use this to determine if `useEffect()` hook needs to run again
   // console.log("SavedBooks data", data)
